@@ -10,8 +10,6 @@ let router= Router();
 export default router.get("/",async (req,res)=>{
     try{
         
-        
-        
         let {student_id,search}=req.query;
 
         //pagination
