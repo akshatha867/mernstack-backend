@@ -9,7 +9,7 @@ export let authenticate=(req,res,next)=>{
           return send(res,RESPONSE.ACCESS_DENIED);
         }
 
-        let decoded=jwt.verify(token,process.env.SECRECT_KEY);
+        let decoded=jwt.verify(token,process.env.SECRET_KEY);
         req.user=decoded;
         next();
         

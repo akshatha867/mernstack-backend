@@ -10,4 +10,5 @@ export const STATUS={
 export const ROLE={
     STUDENT:1,
     TEACHER:2,
+    ADMIN:0,
 }

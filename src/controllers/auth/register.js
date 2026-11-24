@@ -10,11 +10,16 @@ import {
   STATUS,
 } from "../../config/constant.js";
 import bcrypt from "bcrypt";
+import { authenticate } from "../../middleware/authenticate.js";
 
 let router = Router();
 
-export default router.post("/", async (req, res) => {
+export default router.post("/",authenticate, async (req, res) => {
   try {
+
+     if(req.user.role!==ROLE.ADMIN){
+      return send(res,RESPONSE.ACCESS_DENIED);
+     }
     let { name, email, phone, password, age } = req.body || {};
 
     if (!name) {
