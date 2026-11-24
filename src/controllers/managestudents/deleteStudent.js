@@ -2,15 +2,19 @@ import { Router } from "express";
 import { send, setErrMsg } from "../../helper/responseHelper.js";
 import { RESPONSE } from "../../config/global.js";
 import userModel from "../../model/userModel.js";
-import { STATUS } from "../../config/constant.js";
+import { ROLE, STATUS } from "../../config/constant.js";
+import { authenticate } from "../../middleware/authenticate.js";
 let router = Router();
 
-export default router.put("/", async (req, res) => {
+export default router.put("/", authenticate, async (req, res) => {
   try {
-    let {student_id} = req.query;
+    if (req.user.role !== ROLE.TEACHER) {
+      return send(res, RESPONSE.ACCESS_DENIED);
+    }
+    let { student_id } = req.query;
 
-    console.log("hjbhjbbh",student_id);
-    
+    console.log("hjbhjbbh", student_id);
+
     if (!student_id) {
       return send(res, setErrMsg(RESPONSE.REQUIRED, "Student id"));
     }
@@ -32,11 +36,10 @@ export default router.put("/", async (req, res) => {
     //   },
     // );
 
-
     //permanent delete
-     await userModel.findByIdAndDelete({
-      _id:student_id,
-     })
+    await userModel.findByIdAndDelete({
+      _id: student_id,
+    });
 
     return send(res, RESPONSE.SUCCESS);
   } catch (error) {
@@ -44,6 +47,3 @@ export default router.put("/", async (req, res) => {
     return send(res, RESPONSE.ERROR);
   }
 });
-
-
-

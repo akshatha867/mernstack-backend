@@ -3,10 +3,15 @@ import userModel from "../../model/userModel.js";
 import { RESPONSE } from "../../config/global.js";
 import { send, setErrMsg } from "../../helper/responseHelper.js";
 import { EMAIL_REGEX, PHONEREGEX, ROLE, STATUS } from "../../config/constant.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 let router = Router();
- export default router.post("/",async(req , res )=>{
+ export default router.post("/",authenticate,async(req , res )=>{
     try{
+
+        if(req.user.role!==ROLE.TEACHER){
+            return send(res,RESPONSE.ACCESS_DENIED);
+        }
         let {name,email,phone,age}=req.body || {};
 
         if(!name){
@@ -42,8 +47,8 @@ let router = Router();
             return send (res,setErrMsg(RESPONSE.INVALID,"Phone"))
         }
 
-        let isEmailExists= await studentmodel.findOne({email:email});
-        let isPhoneExist = await studentmodel.findOne({phone:phone});
+        let isEmailExists= await userModel.findOne({email:email});
+        let isPhoneExist = await userModel.findOne({phone:phone});
 
         if(isEmailExists){
             return send(res,setErrMsg(RESPONSE.ALREADY_EXISTS,"Email"))

@@ -1,8 +1,9 @@
-import { Router } from "express";
+import { json, Router } from "express";
 import { send, setErrMsg } from "../../helper/responseHelper.js";
 import { RESPONSE } from "../../config/global.js";
 import userModel from "../../model/userModel.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 let router=Router();
 
@@ -20,7 +21,15 @@ export default router.post("/",async(req,res)=>{
      let userData=await userModel.findOne({email:email});
 
      if(userData && (await bcrypt.compare(password,userData.password))){
-        return send(res,RESPONSE.SUCCESS,userData);
+        let token = jwt.sign(
+         {
+         user_id:userData._id,
+         name: userData.name,
+         role: userData.role,
+         },
+         process.env.SECRECT_KEY,
+        );
+        return send(res,RESPONSE.SUCCESS,token);
      }else{
         return send(res,setErrMsg(RESPONSE.INVALID,"User Credentials"));
      }        

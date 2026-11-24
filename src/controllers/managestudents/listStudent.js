@@ -2,13 +2,17 @@ import {Router} from "express";
 import userModel from "../../model/userModel.js";
 import { send, setErrMsg } from "../../helper/responseHelper.js";
 import { RESPONSE } from "../../config/global.js";
-import { STATUS } from "../../config/constant.js";
+import { ROLE, STATUS } from "../../config/constant.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 
 let router= Router();
 
-export default router.get("/",async (req,res)=>{
+export default router.get("/", authenticate,async (req,res)=>{
     try{
+        // if(req.user.role!==ROLE.TEACHER){
+        //     return send(res,RESPONSE.ACCESS_DENIED);
+        // }
         
         let {student_id,search}=req.query;
 
@@ -20,6 +24,10 @@ export default router.get("/",async (req,res)=>{
         let query={
             status:STATUS.ACTIVE,
         };
+
+        if (req.user.role === ROLE.STUDENT) {
+            query._id= req.user.user_id; 
+        }
 
         if(student_id){
             query._id=student_id;

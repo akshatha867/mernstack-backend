@@ -30,4 +30,10 @@ export const RESPONSE ={
     message:" not found"
 
    },
+
+   ACCESS_DENIED:{
+    code:404,
+    message: " access denied"
+
+   },
 };

@@ -2,14 +2,21 @@ import { Router } from "express";
 import userModel from "../../model/userModel.js";
 import { RESPONSE } from "../../config/global.js";
 import { send, setErrMsg } from "../../helper/responseHelper.js";
-import { EMAIL_REGEX, PHONEREGEX, STATUS } from "../../config/constant.js";
+import { EMAIL_REGEX, PHONEREGEX, ROLE, STATUS } from "../../config/constant.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 let router = Router();
 
-export default router.put("/", async (req, res) => {
+export default router.put("/",authenticate, async (req, res) => {
   try {
+     
+
     let { student_id } = req.query;
     let { name, email, phone, age } = req.body;
+
+    if(req.user.role === ROLE.STUDENT){
+      student_id: req.user.user.id;
+    }
 
     let updates = {};
 
@@ -42,6 +49,8 @@ export default router.put("/", async (req, res) => {
     if (age) {
       updates.age = age;
     }
+
+
 
     await userModel.updateOne(
       {
