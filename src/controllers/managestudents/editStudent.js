@@ -9,60 +9,73 @@ import {
   STATUS,
 } from "../../config/constant.js";
 import { authenticate } from "../../middleware/authenticate.js";
+import { upload } from "../../middleware/uploads.js";
+
+const uploads = upload.single("image");
 
 let router = Router();
 
 export default router.put("/", authenticate, async (req, res) => {
   try {
-    let { student_id } = req.query;
-    let { name, email, phone, age } = req.body;
-
-    if (req.user.role === ROLE.STUDENT) {
-      student_id: req.user.user.id;
-    }
-
-    let updates = {};
-
-    if (name) {
-      updates.name = name;
-    }
-    if (email) {
-      let isEmail = email.match(EMAIL_REGEX);
-      if (!isEmail) {
-        return send(res, setErrMsg(RESPONSE.INVALID, "Email"));
-      }
-      let isEmailExists = await userModelmodel.findOne({ email: email });
-      if (isEmailExists) {
-        return send(res, setErrMsg(RESPONSE.ALREADY_EXISTS, "Email"));
-      }
-      updates.email = email;
-    }
-    if (phone) {
-      let isPhone = phone.match(PHONEREGEX);
-      if (!isPhone) {
-        return send(res, setErrMsg(RESPONSE.INVALID, "Phone"));
-      }
-      let isPhoneExist = await userModel.findOne({ phone: phone });
-      if (isPhoneExist) {
-        return send(res, setErrMsg(RESPONSE.ALREADY_EXISTS, "Phone no "));
+    uploads(req, res, async (err) => {
+      if (err) {
+        return send(res, RESPONSE.MULTER_ERROR);
       }
 
-      updates.phone = phone;
-    }
-    if (age) {
-      updates.age = age;
-    }
+      let { student_id } = req.query;
+      let { name, email, phone, age } = req.body;
 
-    await userModel.updateOne(
-      {
-        _id: student_id,
-      },
-      {
-        $set: updates,
-      },
-    );
+      if (req.user.role === ROLE.STUDENT) {
+        student_id: req.user.user.id;
+      }
 
-    return send(res, RESPONSE.SUCCESS);
+      let updates = {};
+
+      if (req.file) {
+        updates.image = req.file.filename;
+      }
+
+      if (name) {
+        updates.name = name;
+      }
+      if (email) {
+        let isEmail = email.match(EMAIL_REGEX);
+        if (!isEmail) {
+          return send(res, setErrMsg(RESPONSE.INVALID, "Email"));
+        }
+        let isEmailExists = await userModelmodel.findOne({ email: email });
+        if (isEmailExists) {
+          return send(res, setErrMsg(RESPONSE.ALREADY_EXISTS, "Email"));
+        }
+        updates.email = email;
+      }
+      if (phone) {
+        let isPhone = phone.match(PHONEREGEX);
+        if (!isPhone) {
+          return send(res, setErrMsg(RESPONSE.INVALID, "Phone"));
+        }
+        let isPhoneExist = await userModel.findOne({ phone: phone });
+        if (isPhoneExist) {
+          return send(res, setErrMsg(RESPONSE.ALREADY_EXISTS, "Phone no "));
+        }
+
+        updates.phone = phone;
+      }
+      if (age) {
+        updates.age = age;
+      }
+
+      await userModel.updateOne(
+        {
+          _id: student_id,
+        },
+        {
+          $set: updates,
+        },
+      );
+
+      return send(res, RESPONSE.SUCCESS);
+    });
   } catch (error) {
     console.log("Edit student error", error);
     return send(res, RESPONSE.ERROR);

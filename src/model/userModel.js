@@ -31,6 +31,10 @@ let userSchema = mongoose.Schema({
         required:true,
         default:1,
     },
+    image:{
+        type:String,
+        required:false,
+    },
     
 });
 export default mongoose.model("user_model",userSchema);

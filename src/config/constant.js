@@ -1,7 +1,8 @@
 export const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 export const PHONEREGEX = /^(\+91|\+91\-|0)?[789]\d{9}$/;
 export const PASSWORDREGEX=/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-
+  
+export const BASE_URL="http://localhost:8000/";
 
 export const STATUS={
     ACTIVE:1,
