@@ -13,7 +13,7 @@ export default router.put("/", authenticate, async (req, res) => {
     }
     let { student_id } = req.query;
 
-    console.log("hjbhjbbh", student_id);
+    console.log("Student ID:", student_id);
 
     if (!student_id) {
       return send(res, setErrMsg(RESPONSE.REQUIRED, "Student id"));

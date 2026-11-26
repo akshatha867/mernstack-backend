@@ -20,7 +20,8 @@ const fileFilter = (req,file,cb) =>{
         !file.mimetype.includes("png")
     ){
         cb(null,false);
-        cb(new Error("Only JPG/JPEG/PNG images are allowed"));
+        
+       return cb(new Error("Only JPG/JPEG/PNG images are allowed"));
     }
     cb(null,true);
 };

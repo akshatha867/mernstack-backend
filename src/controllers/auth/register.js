@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { response, Router } from "express";
 import userModel from "../../model/userModel.js";
 import { RESPONSE } from "../../config/global.js";
 import { send, setErrMsg } from "../../helper/responseHelper.js";
@@ -11,31 +11,38 @@ import {
 } from "../../config/constant.js";
 import bcrypt from "bcrypt";
 import { authenticate } from "../../middleware/authenticate.js";
+import { upload } from "../../middleware/uploads.js";
+
+let uploads = upload.single("image");
 
 let router = Router();
 
-export default router.post("/",authenticate, async (req, res) => {
+export default router.post("/", authenticate, async (req, res) => {
   try {
+    if (req.user.role !== ROLE.ADMIN) {
+      return send(res, RESPONSE.ACCESS_DENIED);
+    }
 
-     if(req.user.role!==ROLE.ADMIN){
-      return send(res,RESPONSE.ACCESS_DENIED);
+    uploads(req,res,async(err)=>{
+      if(err){
+        return send(res,RESPONSE.MULTER_ERROR,err);
+      }
+     if(!req.file){
+      return send(res,setErrMsg(RESPONSE.REQUIRED,"Image"));
      }
+
+     let image=req.file.filename;
+
     let { name, email, phone, password, age } = req.body || {};
 
     if (!name) {
       return send(res, setErrMsg(RESPONSE.REQUIRED, "Name"));
     }
     if (!email) {
-      return res.status(201).json({
-        code: 201,
-        message: "Email is required",
-      });
+      return send(res,setErrMsg(RESPONSE.REQUIRED,"Email"));
     }
     if (!phone) {
-      return res.status(201).json({
-        code: 201,
-        message: "phone is required",
-      });
+       return send(res,setErrMsg(RESPONSE.REQUIRED,"Phone"));
     }
 
     let isEmail = email.match(EMAIL_REGEX);
@@ -71,13 +78,15 @@ export default router.post("/",authenticate, async (req, res) => {
       phone: phone,
       age: age,
       password: hashedPassword,
+      image:image,
       role: ROLE.TEACHER,
       status: STATUS.ACTIVE,
     });
 
     return send(res, RESPONSE.SUCCESS);
+  });
   } catch (error) {
-    console.log("Create Student", error);
+    console.log("Create Teacher", error);
 
     return send(res, RESPONSE.ERROR);
   }
