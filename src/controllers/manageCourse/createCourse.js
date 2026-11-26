@@ -14,18 +14,16 @@ export default router.post("/", authenticate, async (req, res) => {
       return send(res, RESPONSE.ACCESS_DENIED);
     }
 
-   
-
     let { title, description, teacher_id } = req.body;
 
     if (!teacher_id) {
       return send(res, setErrMsg(RESPONSE.REQUIRED, "teacher_id"));
     }
 
-    let isRoleTeacher = await userModel.findOne({_id:teacher_id});
+    let isRoleTeacher = await userModel.findOne({ _id: teacher_id });
     console.log(isRoleTeacher);
-    if(isRoleTeacher.role !== ROLE.TEACHER){
-        return send(res,setErrMsg(RESPONSE.NOT_FOUND,"Teacher id"));
+    if (isRoleTeacher.role !== ROLE.TEACHER) {
+      return send(res, setErrMsg(RESPONSE.NOT_FOUND, "Teacher id"));
     }
 
     await courseModel.create({
