@@ -25,7 +25,7 @@ export default router.post("/", authenticate, async (req, res) => {
     let isRoleTeacher = await userModel.findOne({_id:teacher_id});
     console.log(isRoleTeacher);
     if(isRoleTeacher.role !== ROLE.TEACHER){
-        return send(res,RESPONSE.NOT_FOUND);
+        return send(res,setErrMsg(RESPONSE.NOT_FOUND,"Teacher id"));
     }
 
     await courseModel.create({
