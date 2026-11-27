@@ -10,6 +10,7 @@ let router = Router();
 
 export default router.get("/", authenticate, async (req, res) => {
   try {
+    
     if (req.user.role === ROLE.STUDENT) {
       return send(res, RESPONSE.ACCESS_DENIED);
     }
@@ -18,13 +19,15 @@ export default router.get("/", authenticate, async (req, res) => {
     // if (isStudent.role === ROLE.STUDENT) {
     //   return send(res, RESPONSE.ACCESS_DENIED);
     // }
-
+   let isTeacher = await userModel.findOne({role:req.user.role})
+   if(isTeacher.role === ROLE.TEACHER){
+    console.log(isTeacher);
     let id = await courseModel.findOne({ teacher_id: req.user.user_id });
     console.log(id);
     if (!id) {
       return send(res, setErrMsg(RESPONSE.NOT_FOUND, "Teacher id"));
     }
-
+  }
     let user_id;
     if (req.user.role === ROLE.TEACHER) {
       user_id = req.user.user_id;
